@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fridge Hero 🍳</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    :root {
+      --primary: #8b5cf6;
+      --secondary: #ec4899;
+      --dark: #1f2937;
+      --light: #f9fafb;
+    }
+    body {
+      font-family: 'Poppins', -apple-system, sans-serif;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 2.5rem;
+      color: var(--dark);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 30px;
+      font-size: 1.1rem;
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      color: var(--dark);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+    button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 10px;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .result-card {
+      margin-top: 30px;
+      padding: 24px;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      display: none;
+      animation: slideUp 0.5s ease;
+    }
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .dish-name {
+      font-size: 1.5rem;
+      color: var(--dark);
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .recipe-steps {
+      list-style: none;
+    }
+    .recipe-steps li {
+      padding: 12px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+    }
+    .error {
+      color: #dc2626;
+      text-align: center;
+      margin-top: 16px;
+      display: none;
+    }
+    .loading {
+      text-align: center;
+      color: var(--primary);
+      margin-top: 16px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Fridge Hero 🍳</h1>
+    <p class="subtitle">Turn your ingredients into magic</p>
+
+    <div class="input-group">
+      <label>Ingredient 1</label>
+      <input type="text" id="ingredient1" placeholder="e.g., Chicken">
+    </div>
+    <div class="input-group">
+      <label>Ingredient 2</label>
+      <input type="text" id="ingredient2" placeholder="e.g., Lemon">
+    </div>
+    <div class="input-group">
+      <label>Ingredient 3</label>
+      <input type="text" id="ingredient3" placeholder="e.g., Garlic">
+    </div>
+
+    <button id="cookBtn">Cook Magic ✨</button>
+    <div class="loading">🔮 Creating your masterpiece...</div>
+    <div class="error"></div>
+
+    <div class="result-card" id="resultCard">
+      <div class="dish-name" id="dishName"></div>
+      <ol class="recipe-steps" id="recipeSteps"></ol>
+    </div>
+  </div>
+
+  <script>
+    const API_KEY ='AIzaSyDXEk_EOcS8BpzzEljgK1n7_cPNUfiL87c'; // Replace with your key
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+    document.getElementById('cookBtn').addEventListener('click', async () => {
+      // Get ingredients
+      const ing1 = document.getElementById('ingredient1').value.trim();
+      const ing2 = document.getElementById('ingredient2').value.trim();
+      const ing3 = document.getElementById('ingredient3').value.trim();
+
+      // Validate
+      if (!ing1 || !ing2 || !ing3) {
+        showError('Please enter all 3 ingredients');
+        return;
+      }
+
+      // UI states
+      const btn = document.getElementById('cookBtn');
+      const loading = document.querySelector('.loading');
+      const resultCard = document.getElementById('resultCard');
+      const errorDiv = document.querySelector('.error');
+
+      btn.disabled = true;
+      loading.style.display = 'block';
+      resultCard.style.display = 'none';
+      errorDiv.style.display = 'none';
+
+      try {
+        // Call Gemini API
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `You are a creative Michelin-star chef. Given these 3 ingredients: ${ing1}, ${ing2}, ${ing3}, create:
+1. A fancy French-inspired dish name with simple english
+2. Exactly 3 cooking steps (each step should be one clear sentence)
+
+Respond ONLY with valid JSON in this exact format:
+{
+  "dishName": "Lemon Garlic Chicken",
+  "steps": [
+    "Season the chicken with minced garlic and lemon zest, then sear in olive oil until golden.",
+    "Deglaze the pan with lemon juice and white wine, creating a silky sauce.",
+    "Garnish with fresh herbs and serve immediately with roasted vegetables."
+    "simple english"
+  ]
+}
+
+Important: Return only the JSON, no markdown, no explanation.`
+              }]
+            }]
+          })
+        });
+
+
+        if (!response.ok) {
+          const errText=await response.text();
+          console.error("API ERROR:",errText);
+          throw new Error("API failed:"+errText);
+        }
+
+        const data = await response.json();
+        const text = data.candidates[0].content.parts[0].text;
+
+        // Parse JSON (handle potential markdown wrapping)
+        let jsonText = text.trim();
+        if (jsonText.startsWith('```json')) {
+          jsonText = jsonText.replace(/```json\n?/g, '').replace(/```/g, '');
+        }
+
+        const recipe = JSON.parse(jsonText);
+
+        // Display result
+        document.getElementById('dishName').textContent = recipe.dishName;
+        const stepsList = document.getElementById('recipeSteps');
+        stepsList.innerHTML = '';
+
+        recipe.steps.forEach((step, index) => {
+          const li = document.createElement('li');
+          li.textContent = `${index + 1}. ${step}`;
+          stepsList.appendChild(li);
+        });
+
+        resultCard.style.display = 'block';
+
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        btn.disabled = false;
+        loading.style.display = 'none';
+      }
+    });
+
+    function showError(message) {
+      const errorDiv = document.querySelector('.error');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
