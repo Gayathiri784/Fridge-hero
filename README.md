@@ -1,5 +1,13 @@
-Fridge Hero is a smart food-generation project that helps users decide what to cook using the ingredients they already have at home. The user simply enters three available ingredients, and Fridge Hero suggests a creative and practical food recipe that can be prepared using them.
+Just completed Fridge Hero 🍳, an AI-powered web app that helps users discover recipes from ingredients they already have at home.
 
-The main goal of Fridge Hero is to reduce food waste, save time, and make cooking easier. Instead of wondering what to prepare with limited ingredients, users can quickly discover a suitable dish and get ideas for turning simple ingredients into a delicious meal.
+✨ Features:
 
-Fridge Hero is designed to be simple, useful, and user-friendly, making it a helpful companion for anyone who wants to cook with what they already have in their fridge.
+Enter 3 ingredients
+
+Get a creative dish name
+
+Receive 3 easy cooking steps
+
+Responsive and animated UI
+
+🛠️ Built withHTML, CSS, JavaScript, and Google Gemini API
