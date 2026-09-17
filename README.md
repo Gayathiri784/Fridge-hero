@@ -1,3 +1,6 @@
+NOTE: An API key is required to use this application. You can
+get your API key from Google AI Studio.
+
 Just completed Fridge Hero 🍳, an AI-powered web app that helps users discover recipes from ingredients they already have at home.
 
 ✨ Features:
