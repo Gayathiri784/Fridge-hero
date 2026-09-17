@@ -27,4 +27,4 @@ Receive 3 easy cooking steps
 
 Responsive and animated UI
 
-🛠️ Built withHTML, CSS, JavaScript, and Google Gemini API
+🛠️ Built with HTML, CSS, JavaScript, and Google Gemini API
